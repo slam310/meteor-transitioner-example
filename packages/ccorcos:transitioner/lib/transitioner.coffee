@@ -39,7 +39,20 @@ class TransitionerClass
 @Transitioner = new TransitionerClass()
 Transitioner = @Transitioner
 
+counter = () ->
+  count = 0
+  return () -> count++
+
+uniqueIdMaker = counter()
+
+Template.transitioner.created = ->
+  @id = uniqueIdMaker()
+
+Template.transitioner.helpers
+  id: () -> Template.instance().id
+
 Template.transitioner.rendered = ->
+
   lastRoute = null
   currentRoute = null
 
@@ -47,7 +60,7 @@ Template.transitioner.rendered = ->
     lastRoute = currentRoute
     currentRoute = Router.current().route.getName()
 
-  @find("#transitioner")?._uihooks =
+  @find("#transitioner-"+@id)?._uihooks =
     insertElement: (node, next) ->
       Transitioner.getAnimation(lastRoute, currentRoute).insertElement(node, next)
 
