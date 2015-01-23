@@ -5,26 +5,6 @@ html, body {
   padding: 0;
 }
 
-#transitioner {
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
-  position: relative;
-}
-#transitioner>div {
-  height: 100%;
-  width: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
-
-
-
-
-
-
 
 
 .main {
@@ -46,21 +26,29 @@ html, body {
 
 .slideDown {
   background-color: #e6e728;
+  color: black;
 }
 
 .fade {
   background-color: #fff;
+  color: black;
+}
+
+.buttons {
+  position: absolute;
+  width: 140px;
+  height: 350px; // 60 * 5 + 10*5
+  top: ~"calc(50% - 175px)";
+  left: ~"calc(50% - 70px)";
 }
 
 .button {
-  position: absolute;
   width: 140px;
   height: 60px;
-  top: ~"calc(50% - 30px)";
-  left: ~"calc(50% - 70px)";
   border-radius: 10px;
   text-align: center;
   line-height: 60px;
+  margin-bottom: 10px;
 }
 
 a {
