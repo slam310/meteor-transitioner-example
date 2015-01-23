@@ -11,6 +11,7 @@ Package.onUse(function(api) {
   api.use([
     'coffeescript',
     'velocityjs:velocityjs',
+    'iron:router',
     'templating',
     'underscore'
   ], 'client');
