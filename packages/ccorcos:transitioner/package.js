@@ -1,6 +1,6 @@
 Package.describe({
   name: 'ccorcos:transitioner',
-  summary: 'Transitions integrated with iron router.',
+  summary: 'Page transitions integrated with Iron Router.',
   version: '0.0.1',
   git: 'https://github.com/ccorcos/'
 });
@@ -20,9 +20,6 @@ Package.onUse(function(api) {
     'lib/transitioner.css',
     'lib/transitioner.html',
     'lib/transitioner.coffee',
-    'lib/animations/none.coffee',
-    'lib/animations/slide.coffee',
-    'lib/animations/fade.coffee',
   ], 'client');
 
   api.export('Transitioner', ['client']);

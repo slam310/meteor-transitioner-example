@@ -1,50 +1,56 @@
-# check that iron route exists
-
 class TransitionerClass
-  constructor: (@default='none') ->
-    @animations = {}
-    @reverseAnimations = {}
+  constructor: (@defaultVelocityAnimation) ->
     @transitions = []
-
-  animationPair: (a, b) ->
-    @reverseAnimations[a] = b
-    @reverseAnimations[b] = a
-
-  reverseAnimation: (a) -> 
-    @reverseAnimations[a]
   
-  transition: (fromRoute, toRoute, animationName, options) ->
-    duration = 600
-    easing = 'ease-in-out'
-    reverse = true
-    if options
-      if 'duration' of options then duration = options.duration
-      if 'easing' of options then easing = options.easing
-      if 'reverse' of options then reverse = options.reverse
-    # this is Router.route but for transitions
-    # TODO: check that the routes exist in iron router.
-    # TODO: check that the animation exists.
-    @transitions.push {fromRoute, toRoute, animationName, duration, easing}
-    # the reverse
-    if reverse
-      reverseAnimationName = @reverseAnimation(animationName)
-      if reverseAnimationName
-        @transitions.push({fromRoute: toRoute, toRoute: fromRoute, animationName:reverseAnimationName, duration, easing})
-    return
+  transition: (obj) ->
+    unless obj?.fromRoute?
+      console.log 'ERROR: transition object must contain a fromRoute'
+      return
+    unless obj?.toRoute?
+      console.log 'ERROR: transition object must contain a toRoute'
+      return
+    unless obj?.velocityAnimaton?
+      console.log 'ERROR: transition object must contain a velocityAnimaton'
+      return
+    unless obj?.velocityAnimaton?.in?
+      console.log 'ERROR: transition object must contain a velocityAnimaton.in'
+      return
+    unless obj?.velocityAnimaton?.out?
+      console.log 'ERROR: transition object must contain a velocityAnimaton.out'
+      return
+    @transitions.push obj
 
   getAnimation: (fromRoute, toRoute) ->
     transitionObj = _.find @transitions, (transition) ->
       transition.fromRoute is fromRoute and transition.toRoute is toRoute
 
+    if transitionObj
+      return transitionObj.velocityAnimaton
+    else if @defaultVelocityAnimation
+      return defaultVelocityAnimation
+    else
+      return {
+        in: (node, next) ->
+          $(node).insertBefore(next)
+        out: (node) ->
+          $(node).remove()
+      }
     if transitionObj?.animationName and transitionObj?.animationName of @animations
       return @animations[transitionObj.animationName](transitionObj.duration, transitionObj.easing)
     else
       return @animations[@default]()
 
 
-@Transitioner = new TransitionerClass()
-Transitioner = @Transitioner
+# velocityAnimation is:
+# {
+#   in: insertElement function or velocity uipack string or velocity animation arguments
+#   out: removeElement function or velocity uipack string or velocity animation arguments
+# }
 
+
+Transitioner = new TransitionerClass()
+
+# Make unique transitioner divs.
 counter = () ->
   count = 0
   return () -> count++
@@ -58,20 +64,47 @@ Template.transitioner.helpers
   id: () -> Template.instance().id
 
 
-lastRoute = null
-currentRoute = null
+fromRoute = null
+toRoute = null
 
 Meteor.startup ->
   Tracker.autorun ->
-    lastRoute = currentRoute
-    currentRoute = Router.current()?.route.getName()
+    fromRoute = toRoute
+    toRoute = Router.current()?.route.getName()
 
 Template.transitioner.rendered = ->
 
   @find("#transitioner-"+@id)?._uihooks =
     insertElement: (node, next) ->
-      Transitioner.getAnimation(lastRoute, currentRoute).insertElement(node, next)
+      animation = Transitioner.getAnimation(fromRoute, toRoute)
+      if _.isFunction animation?.in 
+        animation.in.apply this, [node, next]
+      else if _.isString animation?.in
+        $(node).insertBefore(next)
+          .velocity animation.in
+      else if _.isArray animation?.in
+        $node = $(node)
+        $node.insertBefore(next)
+          .velocity.apply($node, animation.in)
+      else
+        console.log "ERROR: animation.in not found!!"
+        $(node).insertBefore(next)
 
     removeElement: (node) ->
-      Transitioner.getAnimation(lastRoute, currentRoute).removeElement(node)
-
+      animation = Transitioner.getAnimation(fromRoute, toRoute)
+      if _.isFunction animation?.out 
+        animation.out.apply this, [node]
+      else if _.isString animation?.out
+        $node = $(node)
+        $node.velocity animation.out, 
+          complete: -> $node.remove()
+      else if _.isArray animation?.out
+        $node = $(node)
+        $node.velocity.apply($node, animation.out)
+          .velocity {opacity: 0}, 
+            duration:0
+            queue: true
+            complete: -> $node.remove()
+      else
+        console.log "ERROR: animation.out not found!!"
+        $(node).remove()

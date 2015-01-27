@@ -1,5 +1,18 @@
 # Iron Router Transitioner
 
+
+http://julian.com/research/velocity/#uiPack
+Effects: Pre-Registered
+
+
+
+# velocityAnimation is:
+# {
+#   in: insertElement function or velocity uipack string or velocity animation arguments
+#   out: removeElement function or velocity uipack string or velocity animation arguments
+# }
+
+
 Finally, animations between routes!
 
 ## Getting Started
