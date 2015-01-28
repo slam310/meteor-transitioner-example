@@ -14,87 +14,66 @@ Transitioner.transition
     out: 'transition.slideRightBigOut'
 
 
-slideRight = 
-  in: (node, next) ->
-    $node = $(node)
-    $.Velocity.hook($node, "translateX", "100%");
-    $node.insertBefore(next)
-      .velocity {translateX: ['0%', '100%']},
-        duration: 500
-        easing: 'ease-in-out'
-        queue: false
-  out: (node) ->
-    $node = $(node)
-    $node.velocity {translateX: '-100%'},
-      duration: 500
-      easing: 'ease-in-out'
-      queue: false
-      complete: -> 
-        $node.remove()
+$.Velocity.RegisterEffect 'transition.pushLeftIn',
+    defaultDuration: 500
+    calls: [
+      [ {translateX: ['0%', '-100%']}, 100, { easing: 'ease-in-out' } ]
+    ]
+    reset: {translateX: '-100%'}
 
-slideLeft = 
-  in: (node, next) ->
-    $node = $(node)
-    $.Velocity.hook($node, "translateX", "-100%");
-    $node.insertBefore(next)
-      .velocity {translateX: ['0%', '-100%']},
-        duration: 500
-        easing: 'ease-in-out'
-        queue: false
-  out: (node) ->
-    $node = $(node)
-    $node.velocity {translateX: '100%'},
-      duration: 500
-      easing: 'ease-in-out'
-      queue: false
-      complete: -> 
-        $node.remove()
 
-slideUp = 
-  in: (node, next) ->
-    $node = $(node)
-    $.Velocity.hook($node, "translateY", "100%");
-    $node.insertBefore(next)
-      .velocity {translateY: ['0%', '100%']},
-        duration: 500
-        easing: 'ease-in-out'
-        queue: false
-  out: (node) ->
-    $node = $(node)
-    $node.velocity {translateY: '-100%'},
-      duration: 500
-      easing: 'ease-in-out'
-      queue: false
-      complete: -> 
-        $node.remove()
+$.Velocity.RegisterEffect 'transition.pushRightOut', 
+    defaultDuration: 500
+    calls: [ 
+      [ {translateX:['100%', '0%']}, 100, { easing: 'ease-in-out' } ]
+    ]
+    reset: {translateX: '0%'}
 
-slideDown = 
-  in: (node, next) ->
-    $node = $(node)
-    $.Velocity.hook($node, "translateY", "-100%");
-    $node.insertBefore(next)
-      .velocity {translateY: ['0%', '-100%']},
-        duration: 500
-        easing: 'ease-in-out'
-        queue: false
-  out: (node) ->
-    $node = $(node)
-    $node.velocity {translateY: '100%'},
-      duration: 500
-      easing: 'ease-in-out'
-      queue: false
-      complete: -> 
-        $node.remove()
+$.Velocity.RegisterEffect 'transition.pushRightIn', 
+    defaultDuration: 500
+    calls: [ [ {translateX: ['0%', '100%']}, 100, { easing: 'ease-in-out' } ] ]
+    reset: {translateX: '100%'}
+
+$.Velocity.RegisterEffect 'transition.pushLeftOut',
+    defaultDuration: 500
+    calls: [ [ {translateX: ['-100%', '0%']}, 100, { easing: 'ease-in-out' } ] ]
+    reset: {translateX: '0%'}
+
+$.Velocity.RegisterEffect 'transition.pushUpIn', 
+    defaultDuration: 500
+    calls: [ [ {translateY: ['0%', '-100%']}, 100, { easing: 'ease-in-out' } ] ]
+    reset: {translateY: '-100%'}
+
+$.Velocity.RegisterEffect 'transition.pushDownOut', 
+    defaultDuration: 500
+    calls: [ [ {translateY: ['100%', '0%']}, 100, { easing: 'ease-in-out' } ] ]
+    reset: {translateY: '0%'}
+
+$.Velocity.RegisterEffect 'transition.pushDownIn',
+    defaultDuration: 500
+    calls: [ [ {translateY: ['0%', '100%']}, 100, { easing: 'ease-in-out' } ] ]
+    reset: {translateY: '100%'}
+
+$.Velocity.RegisterEffect 'transition.pushUpOut',
+    defaultDuration: 500
+    calls: [ [ {translateY: ['-100%', '0%']}, 100, { easing: 'ease-in-out' } ] ]
+    reset: {translateY: '0%'}
+
+
 
 Transitioner.transition
   fromRoute: 'main'
   toRoute: 'slideLeft'
-  velocityAnimaton: slideLeft
+  velocityAnimaton:
+    in: 'transition.pushLeftIn'
+    out: 'transition.pushRightOut'
 
 Transitioner.transition
   fromRoute: 'slideLeft'
   toRoute: 'main'
-  velocityAnimaton: slideRight
+  velocityAnimaton:
+    in: 'transition.pushRightIn'
+    out: 'transition.pushLeftOut'
 
 
 Transitioner.transition
@@ -114,13 +93,16 @@ Transitioner.transition
 Transitioner.transition
   fromRoute: 'main'
   toRoute: 'slideDown'
-  velocityAnimaton: slideDown
+  velocityAnimaton: 
+    in: 'transition.pushDownIn'
+    out: 'transition.pushUpOut'
 
 Transitioner.transition
   fromRoute: 'slideDown'
   toRoute: 'main'
-  velocityAnimaton: slideUp
-
+  velocityAnimaton:
+    in: 'transition.pushUpIn'
+    out: 'transition.pushDownOut'
 
 Transitioner.transition
   fromRoute: 'main'
